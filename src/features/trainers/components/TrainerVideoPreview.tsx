@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
-import { ResizeMode, Video } from 'expo-av';
-import { useRef, useState } from 'react';
+import { useVideoPlayer, VideoView } from 'expo-video';
+import { useState } from 'react';
 import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
 interface Props {
@@ -8,11 +8,16 @@ interface Props {
 }
 
 export function TrainerVideoPreview({ videoUrl }: Props) {
-  const video = useRef<Video>(null);
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
+
+  const player = useVideoPlayer(videoUrl, (player) => {
+    if (!player) {
+      setLoading(false);
+      setError(true);
+    }
+  });
 
   return (
     <>
@@ -29,17 +34,12 @@ export function TrainerVideoPreview({ videoUrl }: Props) {
           </View>
         ) : (
           <>
-            <Video
-              ref={video}
-              source={{ uri: videoUrl }}
+            <VideoView
+              player={player}
               style={styles.video}
-              useNativeControls
-              resizeMode={ResizeMode.COVER}
-              onLoad={() => setLoading(false)}
-              onError={() => {
-                setLoading(false);
-                setError(true);
-              }}
+              nativeControls
+              contentFit={'cover'}
+              onFirstFrameRender={() => setLoading(false)}
             />
 
             <Pressable style={styles.expandButton} onPress={() => setFullscreen(true)}>
@@ -55,12 +55,11 @@ export function TrainerVideoPreview({ videoUrl }: Props) {
             <Ionicons name="close" size={28} color="#fff" />
           </Pressable>
 
-          <Video
-            source={{ uri: videoUrl }}
+          <VideoView
+            player={player}
             style={styles.fullscreenVideo}
-            useNativeControls
-            shouldPlay
-            resizeMode={ResizeMode.CONTAIN}
+            nativeControls
+            contentFit={'cover'}
           />
         </View>
       </Modal>
