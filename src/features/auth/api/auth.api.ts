@@ -56,14 +56,13 @@ async function appleAuth(payload: {
       ...(payload?.fullName
         ? {
             user: {
-              name: payload?.fullName || '',
+              name: payload?.fullName,
             },
           }
         : {}),
     });
     return unwrap(res.data.data);
   } catch (error) {
-    console.error(error);
     throw toApiError(error);
   }
 }
