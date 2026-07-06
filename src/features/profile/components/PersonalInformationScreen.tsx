@@ -184,6 +184,7 @@ export function PersonalInformationScreen() {
               onPress={isEditing ? cancelEdit : () => setIsEditing(true)}
               hitSlop={8}
               disabled={updateProfile.isPending}
+              style={styles.editBtn}
             >
               <Typography style={styles.editText}>{isEditing ? 'Cancel' : 'Edit'}</Typography>
             </Pressable>
@@ -466,7 +467,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.semibold,
   },
   editText: {
-    fontSize: 13,
+    fontSize: 15,
     fontFamily: fonts.semibold,
     color: palette.highlightBlue['5'],
   },
@@ -555,5 +556,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: fonts.semibold,
     color: palette.highlightBlue['5'],
+  },
+  editBtn: {
+    backgroundColor: palette.highlightBlue['5'] + '20',
+    paddingHorizontal: 16,
+    borderRadius: 40,
+    paddingVertical: 4,
   },
 });

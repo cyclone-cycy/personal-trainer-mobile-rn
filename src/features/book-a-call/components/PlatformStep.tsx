@@ -214,7 +214,8 @@ export function PlatformStep({ trainer, draft, onUpdate, onContinue }: PlatformS
           styles.footer,
           {
             paddingHorizontal: spacing.md,
-            paddingBottom: spacing.lg,
+            paddingBottom: spacing.md,
+            justifyContent: 'flex-end',
           },
         ]}
       >
@@ -303,5 +304,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.22)',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.34)',
+    borderRadius: 100,
   },
 });

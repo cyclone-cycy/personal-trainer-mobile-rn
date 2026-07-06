@@ -253,7 +253,7 @@ export function BookASessionScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, gap: 36 },
   centered: { alignItems: 'center', justifyContent: 'center' },
   backgroundImage: {
     ...StyleSheet.absoluteFillObject,
