@@ -20,7 +20,7 @@ export type OutreachMethod =
   | 'imessage';
 
 /** Value accepted by POST /bookings `session_platform`. */
-export type SessionPlatform = 'zoom' | 'google_meet' | 'messenger';
+export type SessionPlatform = 'zoom' | 'google_meet' | 'messenger' | 'imessage';
 
 /** Extra field the backend requires for a given method, if any. */
 export type OutreachField = 'phone' | 'messenger' | null;
@@ -41,15 +41,15 @@ export interface OutreachOption {
 }
 
 export const OUTREACH_OPTIONS: OutreachOption[] = [
-  {
-    id: 'zoom_meeting',
-    name: 'Zoom Meeting',
-    description: "We'll send a Zoom link before your session.",
-    icon: 'videocam-outline',
-    usesZoomLogo: true,
-    requires: null,
-    sessionPlatform: 'zoom',
-  },
+  // {
+  //   id: 'zoom_meeting',
+  //   name: 'Zoom Meeting',
+  //   description: "We'll send a Zoom link before your session.",
+  //   icon: 'videocam-outline',
+  //   usesZoomLogo: true,
+  //   requires: null,
+  //   sessionPlatform: 'zoom',
+  // },
   {
     id: 'google_meet',
     name: 'Google Meet',
@@ -71,6 +71,7 @@ export const OUTREACH_OPTIONS: OutreachOption[] = [
     description: 'Your trainer messages you on iMessage.',
     icon: 'chatbubble-ellipses-outline',
     requires: 'phone',
+    sessionPlatform: 'imessage',
   },
   {
     id: 'messenger',

@@ -38,6 +38,6 @@ export function useProfile() {
       });
       return profile;
     },
-    { enabled: !!accessToken && !!userId },
+    { enabled: !!accessToken && !!userId, retry: 1 },
   );
 }

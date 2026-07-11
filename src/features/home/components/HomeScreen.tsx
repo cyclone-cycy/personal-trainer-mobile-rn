@@ -171,7 +171,7 @@ const TrainerListItem = React.memo(function TrainerListItem({ trainer }: Trainer
               adjustsFontSizeToFit
               minimumFontScale={0.82}
             >
-              Work With {firstName}
+              Book Session
             </Typography>
             <View style={styles.workWithIcon}>
               <Ionicons name="arrow-forward" size={15} color="#FFFFFF" />

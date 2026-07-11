@@ -50,11 +50,21 @@ async function appleAuth(payload: {
   identityToken: string;
   fullName?: string | null;
 }): Promise<AuthResponse> {
-  const res = await authClient.post<ApiEnvelope<RawAuthData>>('/auth/apple/mobile', {
-    identity_token: payload.identityToken,
-    ...(payload.fullName ? { full_name: payload.fullName } : {}),
-  });
-  return unwrap(res.data.data);
+  try {
+    const res = await authClient.post<ApiEnvelope<RawAuthData>>('/auth/apple', {
+      id_token: payload?.identityToken,
+      ...(payload?.fullName
+        ? {
+            user: {
+              name: payload?.fullName,
+            },
+          }
+        : {}),
+    });
+    return unwrap(res.data.data);
+  } catch (error) {
+    throw toApiError(error);
+  }
 }
 
 async function refreshTokens(refreshToken: string, accessToken: string): Promise<AuthTokens> {

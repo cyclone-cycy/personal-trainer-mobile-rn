@@ -299,7 +299,7 @@ export function TrainerProfileScreen() {
                 adjustsFontSizeToFit
                 minimumFontScale={0.82}
               >
-                Work With {trainer.name.split(' ')[0]}
+                Book Session
               </Text>
               <View style={styles.glassIcon}>
                 <Ionicons name="arrow-forward" size={15} color="#FFFFFF" />

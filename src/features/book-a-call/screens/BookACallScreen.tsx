@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Image, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Image, Platform, Pressable, StyleSheet, View } from 'react-native';
 import Animated, {
   FadeIn,
   FadeInDown,
@@ -12,7 +12,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Edge, SafeAreaView } from 'react-native-safe-area-context';
 
 import { useAuthStore } from '@/features/auth/store/auth.store';
 import {
@@ -176,7 +176,7 @@ export function BookACallScreen() {
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: colors.background }]}
-      edges={['top', 'bottom']}
+      edges={['top', ...(Platform.OS === 'android' ? ['bottom' as Edge] : [])]}
     >
       <Image source={{ uri: trainer.image }} style={styles.backgroundImage} />
       <View pointerEvents="none" style={styles.backgroundScrim} />
@@ -189,7 +189,7 @@ export function BookACallScreen() {
       {!isSuccess && (
         <Animated.View
           entering={FadeInDown.duration(360)}
-          style={[styles.header, { paddingHorizontal: spacing.md, paddingTop: spacing.sm }]}
+          style={[{ paddingHorizontal: spacing.md, paddingVertical: spacing.sm }]}
         >
           <Pressable onPress={handleBack} hitSlop={12} style={styles.backBtn}>
             <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
@@ -201,9 +201,11 @@ export function BookACallScreen() {
           <View style={styles.progressTrack}>
             <Animated.View style={[styles.progressFill, progressStyle]} />
           </View>
-          <Typography variant="body2" color="rgba(255,255,255,0.74)" style={styles.stepLabel}>
-            Step {numericStep} of 3
-          </Typography>
+          <View style={{ paddingBottom: 20 }}>
+            <Typography variant="body2" color="rgba(255,255,255,0.74)" style={styles.stepLabel}>
+              Step {numericStep} of 3
+            </Typography>
+          </View>
         </Animated.View>
       )}
 
@@ -248,7 +250,7 @@ export function BookACallScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, gap: 36 },
   backgroundImage: {
     ...StyleSheet.absoluteFillObject,
     width: '100%',
@@ -263,7 +265,6 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   centered: { alignItems: 'center', justifyContent: 'center' },
-  header: { paddingBottom: 18 },
   backBtn: { marginBottom: 12 },
   headerTitle: { fontWeight: '700', marginBottom: 12 },
   progressTrack: {

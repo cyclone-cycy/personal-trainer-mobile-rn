@@ -178,7 +178,8 @@ export function PlatformStep({ trainer, draft, onUpdate, onContinue }: PlatformS
           styles.footer,
           {
             paddingHorizontal: spacing.md,
-            paddingBottom: spacing.lg,
+            paddingBottom: spacing.md,
+            justifyContent: 'flex-end',
           },
         ]}
       >
