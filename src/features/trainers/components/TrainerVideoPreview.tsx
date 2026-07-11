@@ -1,66 +1,50 @@
 import { Ionicons } from '@expo/vector-icons';
-import { ResizeMode, Video } from 'expo-av';
-import { useRef, useState } from 'react';
-import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useVideoPlayer, VideoView } from 'expo-video';
+import { useState } from 'react';
+import { Modal, Pressable, StyleSheet, View } from 'react-native';
 
 interface Props {
   videoUrl: string;
 }
 
 export function TrainerVideoPreview({ videoUrl }: Props) {
-  const video = useRef<Video>(null);
-
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
+
+  const player = useVideoPlayer(videoUrl);
 
   return (
     <>
       <View style={styles.container}>
-        {loading && (
-          <View style={styles.loader}>
-            <ActivityIndicator size="large" color="#fff" />
-          </View>
-        )}
+        <VideoView player={player} style={styles.video} nativeControls={true} contentFit="cover" />
 
-        {error ? (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>Failed to load video</Text>
-          </View>
-        ) : (
-          <>
-            <Video
-              ref={video}
-              source={{ uri: videoUrl }}
-              style={styles.video}
-              useNativeControls
-              resizeMode={ResizeMode.COVER}
-              onLoad={() => setLoading(false)}
-              onError={() => {
-                setLoading(false);
-                setError(true);
-              }}
-            />
-
-            <Pressable style={styles.expandButton} onPress={() => setFullscreen(true)}>
-              <Ionicons name="expand" size={20} color="#fff" />
-            </Pressable>
-          </>
-        )}
+        <Pressable
+          style={styles.expandButton}
+          onPress={() => {
+            setFullscreen(true);
+            player.play();
+          }}
+        >
+          <Ionicons name="expand" size={20} color="#fff" />
+        </Pressable>
       </View>
 
       <Modal visible={fullscreen} animationType="slide">
         <View style={styles.fullscreenContainer}>
-          <Pressable style={styles.closeButton} onPress={() => setFullscreen(false)}>
+          <Pressable
+            style={styles.closeButton}
+            onPress={() => {
+              setFullscreen(false);
+              player.pause();
+            }}
+          >
             <Ionicons name="close" size={28} color="#fff" />
           </Pressable>
 
-          <Video
-            source={{ uri: videoUrl }}
+          <VideoView
+            player={player}
             style={styles.fullscreenVideo}
-            useNativeControls
-            shouldPlay
-            resizeMode={ResizeMode.CONTAIN}
+            nativeControls={true}
+            contentFit="contain"
           />
         </View>
       </Modal>
