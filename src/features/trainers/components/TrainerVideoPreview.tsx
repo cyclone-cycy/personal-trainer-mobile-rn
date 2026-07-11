@@ -1,46 +1,21 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { useState } from 'react';
-import { ActivityIndicator, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, View } from 'react-native';
 
 interface Props {
   videoUrl: string;
 }
 
 export function TrainerVideoPreview({ videoUrl }: Props) {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
 
-  const player = useVideoPlayer(videoUrl, (player) => {
-    if (!player) {
-      setLoading(false);
-      setError(true);
-    }
-  });
+  const player = useVideoPlayer(videoUrl);
 
   return (
     <>
       <View style={styles.container}>
-        {loading && (
-          <View style={styles.loader}>
-            <ActivityIndicator size="large" color="#fff" />
-          </View>
-        )}
-
-        {error ? (
-          <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>Failed to load video</Text>
-          </View>
-        ) : (
-          <>
-            <VideoView
-              player={player}
-              style={styles.video}
-              nativeControls
-              contentFit={'cover'}
-              onFirstFrameRender={() => setLoading(false)}
-            />
+        <VideoView player={player} style={styles.video} nativeControls={true} contentFit="cover" />
 
         <Pressable
           style={styles.expandButton}
@@ -68,8 +43,8 @@ export function TrainerVideoPreview({ videoUrl }: Props) {
           <VideoView
             player={player}
             style={styles.fullscreenVideo}
-            nativeControls
-            contentFit={'cover'}
+            nativeControls={true}
+            contentFit="contain"
           />
         </View>
       </Modal>
