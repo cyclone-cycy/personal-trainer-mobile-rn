@@ -42,16 +42,26 @@ export function TrainerVideoPreview({ videoUrl }: Props) {
               onFirstFrameRender={() => setLoading(false)}
             />
 
-            <Pressable style={styles.expandButton} onPress={() => setFullscreen(true)}>
-              <Ionicons name="expand" size={20} color="#fff" />
-            </Pressable>
-          </>
-        )}
+        <Pressable
+          style={styles.expandButton}
+          onPress={() => {
+            setFullscreen(true);
+            player.play();
+          }}
+        >
+          <Ionicons name="expand" size={20} color="#fff" />
+        </Pressable>
       </View>
 
       <Modal visible={fullscreen} animationType="slide">
         <View style={styles.fullscreenContainer}>
-          <Pressable style={styles.closeButton} onPress={() => setFullscreen(false)}>
+          <Pressable
+            style={styles.closeButton}
+            onPress={() => {
+              setFullscreen(false);
+              player.pause();
+            }}
+          >
             <Ionicons name="close" size={28} color="#fff" />
           </Pressable>
 
