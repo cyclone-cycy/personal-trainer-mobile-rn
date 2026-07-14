@@ -2,7 +2,9 @@ import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo, useState } from 'react';
 import {
   FlatList,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   StyleSheet,
   TextInput as RNTextInput,
@@ -159,73 +161,78 @@ export function PhoneInput({
       ) : null}
 
       <Modal transparent visible={pickerVisible} animationType="fade" onRequestClose={closePicker}>
-        <View style={[styles.overlay, { backgroundColor: colors.modalBackdrop }]}>
-          <Pressable style={StyleSheet.absoluteFill} onPress={closePicker} />
-          <View style={[styles.sheet, { backgroundColor: colors.background }]}>
-            <Typography style={[styles.sheetTitle, { color: colors.text }]}>
-              Select country
-            </Typography>
-            <View
-              style={[
-                styles.searchWrapper,
-                { borderColor: colors.border, backgroundColor: colors.inputBackground },
-              ]}
-            >
-              <Ionicons name="search" size={16} color={colors.textSecondary} />
-              <RNTextInput
-                value={search}
-                onChangeText={setSearch}
-                placeholder="Search countries"
-                placeholderTextColor={colors.textSecondary}
-                autoCorrect={false}
-                autoCapitalize="none"
-                style={[styles.searchInput, { color: colors.text }]}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={styles.overlayFill}
+        >
+          <View style={[styles.overlay, { backgroundColor: colors.modalBackdrop }]}>
+            <Pressable style={StyleSheet.absoluteFill} onPress={closePicker} />
+            <View style={[styles.sheet, { backgroundColor: colors.background }]}>
+              <Typography style={[styles.sheetTitle, { color: colors.text }]}>
+                Select country
+              </Typography>
+              <View
+                style={[
+                  styles.searchWrapper,
+                  { borderColor: colors.border, backgroundColor: colors.inputBackground },
+                ]}
+              >
+                <Ionicons name="search" size={16} color={colors.textSecondary} />
+                <RNTextInput
+                  value={search}
+                  onChangeText={setSearch}
+                  placeholder="Search countries"
+                  placeholderTextColor={colors.textSecondary}
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  style={[styles.searchInput, { color: colors.text }]}
+                />
+              </View>
+              <FlatList
+                data={filteredCountries}
+                keyExtractor={(c) => c.code}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+                initialNumToRender={16}
+                contentContainerStyle={styles.listContent}
+                ListEmptyComponent={
+                  <Typography style={[styles.emptyText, { color: colors.textSecondary }]}>
+                    No countries match “{search.trim()}”.
+                  </Typography>
+                }
+                renderItem={({ item: c }) => {
+                  const selected = c.code === country;
+                  return (
+                    <Pressable
+                      onPress={() => handlePick(c.code)}
+                      style={({ pressed }) => [
+                        styles.optionRow,
+                        {
+                          borderColor: selected ? colors.primary : colors.border,
+                          backgroundColor: selected ? colors.primarySubtle : colors.background,
+                        },
+                        pressed && styles.optionRowPressed,
+                      ]}
+                    >
+                      <Typography style={styles.optionFlag}>{countryFlag(c.code)}</Typography>
+                      <View style={styles.optionTextWrap}>
+                        <Typography style={[styles.optionLabel, { color: colors.text }]}>
+                          {c.label}
+                        </Typography>
+                        <Typography style={[styles.optionDial, { color: colors.textSecondary }]}>
+                          {c.dialCode}
+                        </Typography>
+                      </View>
+                      {selected ? (
+                        <Ionicons name="checkmark" size={18} color={colors.primary} />
+                      ) : null}
+                    </Pressable>
+                  );
+                }}
               />
             </View>
-            <FlatList
-              data={filteredCountries}
-              keyExtractor={(c) => c.code}
-              keyboardShouldPersistTaps="handled"
-              showsVerticalScrollIndicator={false}
-              initialNumToRender={16}
-              contentContainerStyle={styles.listContent}
-              ListEmptyComponent={
-                <Typography style={[styles.emptyText, { color: colors.textSecondary }]}>
-                  No countries match “{search.trim()}”.
-                </Typography>
-              }
-              renderItem={({ item: c }) => {
-                const selected = c.code === country;
-                return (
-                  <Pressable
-                    onPress={() => handlePick(c.code)}
-                    style={({ pressed }) => [
-                      styles.optionRow,
-                      {
-                        borderColor: selected ? colors.primary : colors.border,
-                        backgroundColor: selected ? colors.primarySubtle : colors.background,
-                      },
-                      pressed && styles.optionRowPressed,
-                    ]}
-                  >
-                    <Typography style={styles.optionFlag}>{countryFlag(c.code)}</Typography>
-                    <View style={styles.optionTextWrap}>
-                      <Typography style={[styles.optionLabel, { color: colors.text }]}>
-                        {c.label}
-                      </Typography>
-                      <Typography style={[styles.optionDial, { color: colors.textSecondary }]}>
-                        {c.dialCode}
-                      </Typography>
-                    </View>
-                    {selected ? (
-                      <Ionicons name="checkmark" size={18} color={colors.primary} />
-                    ) : null}
-                  </Pressable>
-                );
-              }}
-            />
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );
@@ -269,6 +276,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: fonts.regular,
     textAlign: 'right',
+  },
+  overlayFill: {
+    flex: 1,
   },
   overlay: {
     flex: 1,

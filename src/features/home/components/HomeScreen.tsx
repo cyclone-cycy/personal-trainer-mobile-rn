@@ -225,8 +225,10 @@ export function HomeScreen() {
       const needle = selectedCategory.toLowerCase();
       list = list.filter((t) => {
         const specialty = t.specialty?.toLowerCase() ?? '';
-        const tags = (t.tags ?? []).map((tag) => tag.toLowerCase());
-        return specialty.includes(needle) || tags.some((tag) => tag.includes(needle));
+        return (
+          specialty.includes(needle) ||
+          (t.tags ?? []).some((tag) => tag.toLowerCase().includes(needle))
+        );
       });
     }
 
@@ -235,11 +237,10 @@ export function HomeScreen() {
       list = list.filter((t) => {
         const name = t.name?.toLowerCase() ?? '';
         const specialty = t.specialty?.toLowerCase() ?? '';
-        const tags = (t.tags ?? []).map((tag) => tag.toLowerCase());
         return (
           name.includes(query) ||
           specialty.includes(query) ||
-          tags.some((tag) => tag.includes(query))
+          (t.tags ?? []).some((tag) => tag.toLowerCase().includes(query))
         );
       });
     }

@@ -1,5 +1,7 @@
 import type { Ionicons } from '@expo/vector-icons';
 
+import { env } from '@/shared/constants/env';
+
 // Outreach methods. `id` is the value sent as `contact_mode` on the discovery
 // endpoint (POST /bookings/discovery). Paid session bookings (POST /bookings)
 // use a DIFFERENT, smaller vocabulary for `session_platform` — only zoom,
@@ -51,6 +53,17 @@ export interface OutreachOption {
   sessionPlatform?: SessionPlatform;
 }
 
+// Defined separately so it can be conditionally spread into OUTREACH_OPTIONS
+// only when the WhatsApp feature flag is enabled.
+const WHATSAPP_OUTREACH_OPTION: OutreachOption = {
+  id: 'whatsapp',
+  name: 'WhatsApp',
+  description: 'Your trainer messages you on WhatsApp.',
+  icon: 'logo-whatsapp',
+  requires: 'phone',
+  sessionPlatform: 'whatsapp',
+};
+
 export const OUTREACH_OPTIONS: OutreachOption[] = [
   // {
   //   id: 'zoom_meeting',
@@ -84,16 +97,11 @@ export const OUTREACH_OPTIONS: OutreachOption[] = [
     requires: 'phone',
     sessionPlatform: 'imessage',
   },
-  {
-    id: 'whatsapp',
-    name: 'WhatsApp',
-    // Reuses the phone number collected for phone-based options — no separate
-    // WhatsApp-number field. The trainer messages the client on that number.
-    description: 'Your trainer messages you on WhatsApp.',
-    icon: 'logo-whatsapp',
-    requires: 'phone',
-    sessionPlatform: 'whatsapp',
-  },
+  // WhatsApp is gated behind EXPO_PUBLIC_WHATSAPP_ENABLED (off by default) so it
+  // never reaches production while the backend still rejects it (see caveat
+  // above). It reuses the phone number collected for phone-based options — no
+  // separate WhatsApp-number field. Flip the flag once the backend adds support.
+  ...(env.WHATSAPP_ENABLED ? [WHATSAPP_OUTREACH_OPTION] : []),
   {
     id: 'messenger',
     name: 'Messenger',
