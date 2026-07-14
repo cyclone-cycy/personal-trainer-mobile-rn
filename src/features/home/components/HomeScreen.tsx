@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Href, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Image, Pressable, RefreshControl, ScrollView, View } from 'react-native';
+import { Image, Pressable, RefreshControl, ScrollView, TextInput, View } from 'react-native';
 import type { GestureResponderEvent } from 'react-native';
 import Animated, {
   type AnimatedProps,
@@ -192,6 +192,15 @@ export function HomeScreen() {
   const greeting = getTimeOfDayGreeting();
   const trainerListRef = useRef<FlashListRef<Trainer>>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  const toggleSearch = useCallback(() => {
+    // Clear on every toggle so opening always starts fresh and closing resets
+    // the filtered list back to the full/selected-category view.
+    setSearchQuery('');
+    setSearchOpen((open) => !open);
+  }, []);
   // Always pass `null` so the query key is stable across category switches —
   // we fetch the trainer list once and filter on the client. Previously each
   // category produced its own react-query cache entry, which meant tapping a
@@ -210,14 +219,33 @@ export function HomeScreen() {
     [trainerPages],
   );
   const trainers = useMemo(() => {
-    if (!selectedCategory) return allTrainers;
-    const needle = selectedCategory.toLowerCase();
-    return allTrainers.filter((t) => {
-      const specialty = t.specialty?.toLowerCase() ?? '';
-      const tags = (t.tags ?? []).map((tag) => tag.toLowerCase());
-      return specialty.includes(needle) || tags.some((tag) => tag.includes(needle));
-    });
-  }, [allTrainers, selectedCategory]);
+    let list = allTrainers;
+
+    if (selectedCategory) {
+      const needle = selectedCategory.toLowerCase();
+      list = list.filter((t) => {
+        const specialty = t.specialty?.toLowerCase() ?? '';
+        const tags = (t.tags ?? []).map((tag) => tag.toLowerCase());
+        return specialty.includes(needle) || tags.some((tag) => tag.includes(needle));
+      });
+    }
+
+    const query = searchQuery.trim().toLowerCase();
+    if (query) {
+      list = list.filter((t) => {
+        const name = t.name?.toLowerCase() ?? '';
+        const specialty = t.specialty?.toLowerCase() ?? '';
+        const tags = (t.tags ?? []).map((tag) => tag.toLowerCase());
+        return (
+          name.includes(query) ||
+          specialty.includes(query) ||
+          tags.some((tag) => tag.includes(query))
+        );
+      });
+    }
+
+    return list;
+  }, [allTrainers, selectedCategory, searchQuery]);
   const showTrainerLoading = isLoading && trainers.length === 0;
   const showLoadMore = isFetchingNextPage && trainers.length > 0;
 
@@ -389,7 +417,52 @@ export function HomeScreen() {
 
       {/* CATEGORIES */}
       <Animated.View entering={FadeIn.delay(200).duration(ENTRY_DURATION)}>
-        <Typography style={[styles.sectionTitle, { marginTop: spacing.lg }]}>Categories</Typography>
+        <View style={[styles.sectionTitleRow, { marginTop: spacing.lg }]}>
+          <Typography style={[styles.sectionTitle, styles.sectionTitleInline]}>
+            Categories
+          </Typography>
+          <Pressable
+            onPress={toggleSearch}
+            hitSlop={10}
+            style={styles.searchToggle}
+            accessibilityRole="button"
+            accessibilityLabel={searchOpen ? 'Close trainer search' : 'Search trainers'}
+            accessibilityState={{ expanded: searchOpen }}
+          >
+            <Ionicons name={searchOpen ? 'close' : 'search'} size={18} color={colors.text} />
+          </Pressable>
+        </View>
+
+        {searchOpen ? (
+          <Animated.View entering={FadeInDown.duration(220)} style={styles.searchReveal}>
+            <View style={styles.searchBar}>
+              <Ionicons name="search" size={18} color={colors.textSecondary} />
+              <TextInput
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                placeholder="Search trainers by name or specialty"
+                placeholderTextColor={colors.textSecondary}
+                autoCorrect={false}
+                autoCapitalize="none"
+                autoFocus
+                returnKeyType="search"
+                style={styles.searchInput}
+                accessibilityLabel="Search trainers"
+              />
+              {searchQuery.length > 0 ? (
+                <Pressable
+                  onPress={() => setSearchQuery('')}
+                  hitSlop={10}
+                  accessibilityRole="button"
+                  accessibilityLabel="Clear search"
+                >
+                  <Ionicons name="close-circle" size={18} color={colors.textSecondary} />
+                </Pressable>
+              ) : null}
+            </View>
+          </Animated.View>
+        ) : null}
+
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -457,7 +530,11 @@ export function HomeScreen() {
       {/* TRAINERS TITLE */}
       <Animated.View entering={FadeIn.delay(400).duration(ENTRY_DURATION)}>
         <Typography style={[styles.sectionTitle, { marginTop: spacing.lg }]}>
-          {selectedCategory ? `${selectedCategory} Trainers` : 'Trainers'}
+          {searchQuery.trim()
+            ? 'Search Results'
+            : selectedCategory
+              ? `${selectedCategory} Trainers`
+              : 'Trainers'}
         </Typography>
       </Animated.View>
     </View>
@@ -472,7 +549,11 @@ export function HomeScreen() {
         </>
       ) : (
         <Typography style={styles.emptyTrainersText}>
-          {selectedCategory ? 'No trainers found for this category.' : 'No trainers available yet.'}
+          {searchQuery.trim()
+            ? `No trainers match “${searchQuery.trim()}”.`
+            : selectedCategory
+              ? 'No trainers found for this category.'
+              : 'No trainers available yet.'}
         </Typography>
       )}
     </View>

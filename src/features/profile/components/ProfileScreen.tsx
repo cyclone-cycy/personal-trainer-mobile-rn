@@ -47,6 +47,16 @@ export function ProfileScreen() {
 
   useFocusEffect(
     useCallback(() => {
+      // We already have the user cached from a previous load — revalidate
+      // quietly in the background with no spinner so returning to this screen
+      // (e.g. pressing back from Account Settings) is instant.
+      if (hasUser) {
+        refetch();
+        return;
+      }
+
+      // Cold load with nothing cached — show the focus loader while we fetch,
+      // capped at PROFILE_FOCUS_LOAD_MS so it never lingers.
       let isActive = true;
       setIsFocusLoading(true);
       const timer = setTimeout(() => {
@@ -54,7 +64,7 @@ export function ProfileScreen() {
       }, PROFILE_FOCUS_LOAD_MS);
 
       refetch().finally(() => {
-        if (!hasUser && isActive) setIsFocusLoading(false);
+        if (isActive) setIsFocusLoading(false);
       });
 
       return () => {

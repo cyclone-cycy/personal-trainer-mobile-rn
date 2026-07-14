@@ -10,17 +10,28 @@ import type { Ionicons } from '@expo/vector-icons';
 //   zoom_meeting   — backend creates a Zoom link.            (session: zoom)
 //   google_meet    — backend creates a Google Meet room.     (session: google_meet)
 //   messenger      — Facebook Messenger (requires handle).    (session: messenger)
+//   whatsapp       — WhatsApp message; reuses the phone number (no separate
+//                    field). Trainer follows up on that number. (session: whatsapp)
 //   phone_callback — trainer calls the phone number provided. (discovery only)
 //   imessage       — iMessage from the trainer.               (discovery only)
+//
+// ⚠️ BACKEND CAVEAT (verified against https://api.fitcall.me/docs/spec on
+// 2026-07-14): `whatsapp` is listed in the POST /bookings `session_platform`
+// enum but the spec says it "was never implemented and was dropped from the
+// CHECK constraint in migration 000058", and it is NOT in the POST
+// /bookings/discovery `contact_mode` enum at all. Until the backend re-adds it
+// (DB CHECK constraint + discovery enum), WhatsApp bookings will be REJECTED
+// server-side — keep this off production releases.
 export type OutreachMethod =
   | 'zoom_meeting'
   | 'phone_callback'
   | 'google_meet'
   | 'messenger'
+  | 'whatsapp'
   | 'imessage';
 
 /** Value accepted by POST /bookings `session_platform`. */
-export type SessionPlatform = 'zoom' | 'google_meet' | 'messenger' | 'imessage';
+export type SessionPlatform = 'zoom' | 'google_meet' | 'messenger' | 'whatsapp' | 'imessage';
 
 /** Extra field the backend requires for a given method, if any. */
 export type OutreachField = 'phone' | 'messenger' | null;
@@ -72,6 +83,16 @@ export const OUTREACH_OPTIONS: OutreachOption[] = [
     icon: 'chatbubble-ellipses-outline',
     requires: 'phone',
     sessionPlatform: 'imessage',
+  },
+  {
+    id: 'whatsapp',
+    name: 'WhatsApp',
+    // Reuses the phone number collected for phone-based options — no separate
+    // WhatsApp-number field. The trainer messages the client on that number.
+    description: 'Your trainer messages you on WhatsApp.',
+    icon: 'logo-whatsapp',
+    requires: 'phone',
+    sessionPlatform: 'whatsapp',
   },
   {
     id: 'messenger',

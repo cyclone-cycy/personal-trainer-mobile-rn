@@ -60,6 +60,8 @@ export interface CreateSessionBookingRequest {
   timezone: string;
   /** Required for `messenger`. */
   messenger_handle?: string;
+  /** Required for `whatsapp`/`imessage` (E.164) — "required when session_platform is whatsapp or imessage". */
+  phone_number?: string;
 }
 
 export interface CreatedSessionBooking {
