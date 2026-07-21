@@ -26,6 +26,9 @@ const MONTH_NAMES = [
 ];
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
+// Shown before the user confirms so the reschedule window is clear up front.
+const RESCHEDULE_POLICY = 'You can reschedule this session up to 12 hours before the start time.';
+
 function formatDate(d: Date): string {
   return `${DAY_NAMES[d.getDay()]}, ${MONTH_NAMES[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
 }
@@ -206,6 +209,22 @@ export function SummaryStep({
           ))}
         </Animated.View>
 
+        {/* Reschedule policy — surfaced before confirming */}
+        <Animated.View
+          entering={FadeInUp.delay(220).duration(360)}
+          style={[styles.policyBanner, { backgroundColor: glassSurface, borderColor: glassBorder }]}
+        >
+          <Ionicons
+            name="information-circle-outline"
+            size={18}
+            color={colors.primary}
+            style={styles.policyIcon}
+          />
+          <Typography variant="body2" color={colors.primary} style={styles.policyText}>
+            {RESCHEDULE_POLICY}
+          </Typography>
+        </Animated.View>
+
         {errorMessage ? (
           <Animated.View
             entering={FadeInUp.duration(260)}
@@ -234,7 +253,7 @@ export function SummaryStep({
           label="Confirm Booking"
           isLoading={isSubmitting}
           onPress={onSubmit}
-          style={styles.glassButton}
+          style={[styles.glassButton, { backgroundColor: colors.primary }]}
         />
       </View>
     </View>
@@ -278,6 +297,17 @@ const styles = StyleSheet.create({
   detailIcon: { marginRight: 10 },
   platformValueRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   platformValueLogo: { width: 20, height: 20 },
+  policyBanner: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 14,
+    marginTop: 12,
+  },
+  policyIcon: { marginTop: 1 },
+  policyText: { flex: 1, lineHeight: 20 },
   errorBanner: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -291,7 +321,6 @@ const styles = StyleSheet.create({
   footer: { paddingTop: 12 },
   glassButton: {
     borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.16)',
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.30)',
   },

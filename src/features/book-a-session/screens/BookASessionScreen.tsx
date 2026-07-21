@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, StyleSheet, View } from 'react-native';
 import Animated, {
   FadeIn,
@@ -73,7 +73,12 @@ export function BookASessionScreen() {
     !isLoadingAvailability &&
     !isErrorAvailability &&
     !isErrorUpcoming;
-  const availableSlotDates = getTrainerAvailabilityDates(trainerAvailability, upcomingBookings);
+  // Memoized so tapping a date (which re-renders this screen) doesn't hand
+  // DateTimeStep a fresh array every render and churn its derived slot memos.
+  const availableSlotDates = useMemo(
+    () => getTrainerAvailabilityDates(trainerAvailability, upcomingBookings),
+    [trainerAvailability, upcomingBookings],
+  );
   const createSessionBooking = useCreateSessionBooking();
   const isRefreshingSlots = isRefetchingAvailability || isRefetchingUpcoming;
   const refreshSlots = useCallback(async () => {
