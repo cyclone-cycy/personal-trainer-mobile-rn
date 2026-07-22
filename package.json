@@ -19,6 +19,7 @@
     "typecheck": "tsc --noEmit",
     "version:bump:android": "node scripts/bump-android-version.mjs",
     "aab": "node scripts/build-aab.mjs",
+    "applinks:generate": "node scripts/generate-applinks.mjs",
     "test": "jest",
     "test:watch": "jest --watch",
     "prepare": "husky"

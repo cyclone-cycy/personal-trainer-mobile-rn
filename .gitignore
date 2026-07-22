@@ -42,6 +42,10 @@ yarn-error.*
 .env
 .env*.local
 
+# generated deep-link association files (contain the Apple Team ID; regenerate
+# with `pnpm applinks:generate`)
+well-known/
+
 # typescript
 *.tsbuildinfo
 

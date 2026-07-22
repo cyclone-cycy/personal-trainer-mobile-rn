@@ -9,6 +9,7 @@ import { useNotificationsSocket, usePushNotifications } from '@/features/notific
 import { useOnboardingStore } from '@/features/onboarding/store/onboarding.store';
 import { AppProviders } from '@/providers/AppProviders';
 import { useAppReady } from '@/shared/hooks/useAppReady';
+import { useDeepLinkAuthRedirect } from '@/shared/hooks/useDeepLinkAuthRedirect';
 import { useTheme } from '@/shared/theme';
 
 SplashScreen.preventAutoHideAsync();
@@ -23,6 +24,9 @@ function RootLayoutNav() {
   const [entryDone, setEntryDone] = useState(false);
   const didResetOnboardingForLaunch = useRef(false);
   useNotificationsSocket(isLoggedIn);
+
+  // Replay auth-gated deep links (e.g. the emailed reschedule link) after login.
+  useDeepLinkAuthRedirect(isLoggedIn);
 
   // Initialize and run push notifications globally
   usePushNotifications();
