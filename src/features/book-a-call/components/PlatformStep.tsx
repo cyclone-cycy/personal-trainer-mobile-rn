@@ -3,7 +3,7 @@ import { Image, Pressable, StyleSheet, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
 
-import { OUTREACH_OPTIONS, outreachRequires } from '@/features/bookings';
+import { DISCOVERY_OUTREACH_OPTIONS, outreachRequires } from '@/features/bookings';
 import { Trainer } from '@/features/trainers/types/trainer.types';
 import { Button, isPhoneComplete, PhoneInput, TextInput, Typography } from '@/shared/components';
 import { palette, useTheme } from '@/shared/theme';
@@ -111,7 +111,7 @@ export function PlatformStep({ trainer, draft, onUpdate, onContinue }: PlatformS
           </Typography>
         </Animated.View>
 
-        {OUTREACH_OPTIONS.map((p, i) => {
+        {DISCOVERY_OUTREACH_OPTIONS.map((p, i) => {
           const selected = draft.contactMode === p.id;
           return (
             <Animated.View key={p.id} entering={FadeInUp.delay(280 + i * 60).duration(360)}>

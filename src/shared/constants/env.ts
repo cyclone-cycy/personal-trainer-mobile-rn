@@ -11,9 +11,4 @@ export const env = {
   // (unset/anything but "true") until the IAP products are live in the stores;
   // set to "true" to require a subscription before booking. See useBookingGate.
   PAYWALL_ENABLED: process.env.EXPO_PUBLIC_PAYWALL_ENABLED === 'true',
-  // Gates the WhatsApp outreach option in the booking flows. Disabled by
-  // default because the backend does not yet accept `whatsapp` (see the caveat
-  // in features/bookings/constants/outreach.ts) — bookings with it are rejected
-  // server-side. Set to "true" only once the backend adds support.
-  WHATSAPP_ENABLED: process.env.EXPO_PUBLIC_WHATSAPP_ENABLED === 'true',
 } as const;
