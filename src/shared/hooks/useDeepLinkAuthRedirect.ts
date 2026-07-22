@@ -26,7 +26,13 @@ function extractPath(url: string | null | undefined): string | null {
   }
 }
 
-export function useDeepLinkAuthRedirect(isLoggedIn: boolean) {
+/**
+ * @param destinationReady true once the target (main) stack is actually mounted
+ *   — i.e. `isLoggedIn && !showWelcome`. Gating on this (not just login) means a
+ *   user still in the post-login welcome flow keeps the pending link until the
+ *   destination exists, instead of a replay that navigates into an unmounted stack.
+ */
+export function useDeepLinkAuthRedirect(destinationReady: boolean) {
   const pending = useRef<string | null>(null);
 
   // Capture the incoming URL (cold start + while running). Only stash it when
@@ -51,13 +57,15 @@ export function useDeepLinkAuthRedirect(isLoggedIn: boolean) {
     };
   }, []);
 
-  // Replay the stashed link once the user is authenticated. Defer a tick so the
-  // (main) stack has mounted before we navigate into it.
+  // Replay the stashed link once the destination stack is mounted. `pending` is
+  // retained until then, so a user routed through the welcome flow after login
+  // still gets navigated once it clears. Defer a tick so the (main) stack has
+  // finished mounting before we navigate into it.
   useEffect(() => {
-    if (!isLoggedIn || !pending.current) return;
+    if (!destinationReady || !pending.current) return;
     const target = pending.current;
     pending.current = null;
     const timer = setTimeout(() => router.replace(target as never), 0);
     return () => clearTimeout(timer);
-  }, [isLoggedIn]);
+  }, [destinationReady]);
 }

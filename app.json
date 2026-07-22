@@ -30,7 +30,7 @@
             {
               "scheme": "https",
               "host": "fitcall.me",
-              "pathPrefix": "/session"
+              "pathPrefix": "/session/"
             }
           ],
           "category": ["BROWSABLE", "DEFAULT"]

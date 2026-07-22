@@ -25,8 +25,9 @@ function RootLayoutNav() {
   const didResetOnboardingForLaunch = useRef(false);
   useNotificationsSocket(isLoggedIn);
 
-  // Replay auth-gated deep links (e.g. the emailed reschedule link) after login.
-  useDeepLinkAuthRedirect(isLoggedIn);
+  // Replay auth-gated deep links (e.g. the emailed reschedule link) once the
+  // (main) stack is mounted — which is `isLoggedIn && !showWelcome` below.
+  useDeepLinkAuthRedirect(isLoggedIn && !showWelcome);
 
   // Initialize and run push notifications globally
   usePushNotifications();
