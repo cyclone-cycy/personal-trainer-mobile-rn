@@ -94,6 +94,49 @@ function startOfDay(d: Date) {
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
 
+// Scroll wrapper hoisted to module scope so it keeps a STABLE component identity
+// across DateTimeStep re-renders. Previously this was defined inline in render,
+// so every keystroke/date tap created a new component type and React remounted
+// the whole calendar/time subtree — replaying the entrance animations and making
+// date→time selection flicker. When the parent wires up onRefresh we use the
+// spinning-logo pull-to-refresh (matching the rest of the app); otherwise a
+// plain ScrollView.
+function DateTimeScroll({
+  onRefresh,
+  isRefreshing,
+  paddingHorizontal,
+  children,
+}: {
+  onRefresh?: () => void | Promise<unknown>;
+  isRefreshing?: boolean;
+  paddingHorizontal: number;
+  children: React.ReactNode;
+}) {
+  const contentContainerStyle = [styles.content, { paddingHorizontal }];
+  if (onRefresh) {
+    return (
+      <LogoRefreshScrollView
+        refreshing={!!isRefreshing}
+        onRefresh={() => onRefresh()}
+        style={styles.scroll}
+        contentContainerStyle={contentContainerStyle}
+        showsVerticalScrollIndicator={false}
+      >
+        {children}
+      </LogoRefreshScrollView>
+    );
+  }
+  return (
+    <ScrollView
+      style={styles.scroll}
+      contentContainerStyle={contentContainerStyle}
+      showsVerticalScrollIndicator={false}
+    >
+      {children}
+    </ScrollView>
+  );
+}
+
 interface DateTimeStepProps {
   draft: {
     date: Date | null;
@@ -189,33 +232,13 @@ export function DateTimeStep({
     : TIME_SLOTS;
   const isValid = draft.date !== null && draft.time !== null;
 
-  // When the parent wires up onRefresh, render the spinning-logo refresh used
-  // by HomeScreen so the booking flow matches the rest of the app. Otherwise
-  // fall back to a plain ScrollView (no pull-to-refresh affordance).
-  const ScrollContainer: React.FC<{ children: React.ReactNode }> = ({ children }) =>
-    onRefresh ? (
-      <LogoRefreshScrollView
-        refreshing={isRefreshing}
-        onRefresh={() => onRefresh()}
-        style={styles.scroll}
-        contentContainerStyle={[styles.content, { paddingHorizontal: spacing.md }]}
-        showsVerticalScrollIndicator={false}
-      >
-        {children}
-      </LogoRefreshScrollView>
-    ) : (
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={[styles.content, { paddingHorizontal: spacing.md }]}
-        showsVerticalScrollIndicator={false}
-      >
-        {children}
-      </ScrollView>
-    );
-
   return (
     <View style={styles.container}>
-      <ScrollContainer>
+      <DateTimeScroll
+        onRefresh={onRefresh}
+        isRefreshing={isRefreshing}
+        paddingHorizontal={spacing.md}
+      >
         <Animated.View entering={FadeInDown.duration(360)}>
           <Typography variant="h2" color={glass ? '#FFFFFF' : undefined} style={styles.heading}>
             Pick a date and time
@@ -416,7 +439,7 @@ export function DateTimeStep({
         </Animated.View>
 
         <View style={styles.footerSpacer} />
-      </ScrollContainer>
+      </DateTimeScroll>
 
       <View
         style={[

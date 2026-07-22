@@ -249,10 +249,14 @@ export function useHomeStyles() {
           color: colors.textSecondary,
           textAlign: 'center',
         },
+        // Outer card owns the shadow only. On iOS a view can't both cast a
+        // shadow AND clip children to its borderRadius — combining them stops
+        // the rounded corners from masking, so the image's square corners poke
+        // past the frame ("floating"). Keep `overflow: visible` here and do the
+        // rounded clipping on `trainerPressable` instead.
         trainerCard: {
           backgroundColor: 'rgba(255,255,255,0.10)',
           borderRadius: 18,
-          overflow: 'hidden',
           borderWidth: 1,
           borderColor: 'rgba(255,255,255,0.22)',
           minHeight: 244,
@@ -262,9 +266,12 @@ export function useHomeStyles() {
           shadowOffset: { width: 0, height: 12 },
           elevation: 5,
         },
+        // Inner layer clips the image/gradients to the rounded frame.
         trainerPressable: {
           flex: 1,
           minHeight: 244,
+          borderRadius: 18,
+          overflow: 'hidden',
         },
         trainerCell: {
           flex: 1,

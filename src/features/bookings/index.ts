@@ -21,6 +21,7 @@ export type {
 export {
   OUTREACH_OPTIONS,
   SESSION_OUTREACH_OPTIONS,
+  DISCOVERY_OUTREACH_OPTIONS,
   outreachOption,
   outreachLabel,
   outreachRequires,
