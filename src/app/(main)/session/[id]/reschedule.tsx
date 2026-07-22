@@ -1,10 +1,10 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { useSessionStore } from '@/features/sessions/store/useSessionStore';
+import { useSessionDetails } from '@/features/sessions/hooks/useSessionDetails';
 import { Button, Screen, Typography } from '@/shared/components';
 import { fonts, useTheme } from '@/shared/theme';
 
@@ -23,18 +23,27 @@ const AVAILABLE_TIMES = [
 export default function RescheduleScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { sessions } = useSessionStore();
+  // Fetch the booking by id from the API rather than a local store, so the
+  // screen works when opened cold from a reschedule deep link (email), where
+  // no in-memory session list exists yet.
+  const { data: session, isLoading, isError } = useSessionDetails(id);
   const { colors, spacing } = useTheme();
   const insets = useSafeAreaInsets();
-
-  const session = sessions.find((s) => s.id === id);
 
   const [selectedDate, setSelectedDate] = useState<number>(24); // Default to mock Aug 24
   const [selectedTime, setSelectedTime] = useState<string>('10:30 AM');
 
-  if (!session) {
+  if (isLoading) {
     return (
-      <Screen>
+      <Screen style={styles.centered}>
+        <ActivityIndicator color={colors.primary} />
+      </Screen>
+    );
+  }
+
+  if (isError || !session) {
+    return (
+      <Screen style={styles.centered}>
         <Typography>Session not found</Typography>
       </Screen>
     );
@@ -205,6 +214,11 @@ export default function RescheduleScreen() {
 }
 
 const styles = StyleSheet.create({
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

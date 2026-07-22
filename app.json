@@ -10,7 +10,8 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "net.emerj.fitcall",
-      "usesAppleSignIn": true
+      "usesAppleSignIn": true,
+      "associatedDomains": ["applinks:fitcall.me"]
     },
     "android": {
       "adaptiveIcon": {
@@ -20,7 +21,21 @@
       },
       "predictiveBackGestureEnabled": false,
       "edgeToEdgeEnabled": true,
-      "package": "net.emerj.fitcall"
+      "package": "net.emerj.fitcall",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "fitcall.me",
+              "pathPrefix": "/session/"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
     },
     "web": {
       "output": "static",

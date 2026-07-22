@@ -1,0 +1,13 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "4SBT69NK9W.net.emerj.fitcall",
+        "paths": [
+          "/session/*"
+        ]
+      }
+    ]
+  }
+}
