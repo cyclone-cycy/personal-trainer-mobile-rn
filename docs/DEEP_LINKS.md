@@ -81,18 +81,19 @@ Also make sure any `middleware.ts` `matcher` and custom `rewrites()` exclude
       "namespace": "android_app",
       "package_name": "net.emerj.fitcall",
       "sha256_cert_fingerprints": [
-        "B6:0F:F4:69:14:60:A4:00:71:41:A3:34:09:C7:00:57:C6:A5:80:3D:6C:AE:31:15:AF:19:85:B5:CB:80:C9:F2"
+        "B6:0F:F4:69:14:60:A4:00:71:41:A3:34:09:C7:00:57:C6:A5:80:3D:6C:AE:31:15:AF:19:85:B5:CB:80:C9:F2",
+        "C2:FE:89:28:53:CA:07:58:7F:33:AC:F3:02:6D:B1:9B:41:2E:73:33:A2:46:51:49:F5:95:CD:A5:3D:D6:5D:71"
       ]
     }
   }
 ]
 ```
 
-The fingerprint above is the **local release keystore** (`fitcall-release.keystore`,
-alias `fitcall`). If the app ships via Play Store with **Play App Signing**,
-Google re-signs it — add Google's app-signing SHA-256 (Play Console → Setup →
-App integrity) as another entry in the `sha256_cert_fingerprints` array, or App
-Links won't verify on Play-installed apps.
+Two fingerprints are listed so App Links verify on both distribution paths:
+the first is the **local release keystore** (`fitcall-release.keystore`, alias
+`fitcall`) for direct/sideload installs; the second is the **Play App Signing**
+certificate (Play Console → Setup → App integrity), used because Google re-signs
+Play Store builds with its own key. Add any additional signing certs here.
 
 ## Verifying after deploy
 
